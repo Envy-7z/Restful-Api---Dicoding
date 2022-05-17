@@ -137,7 +137,6 @@ const getBookByIdHandler = (request, h) => {
   }).code(404);
   return response;
 };
-
 const editBookByIdHandler = (request, h) => {
   const { bookId } = request.params;
   const {
