@@ -67,13 +67,15 @@ const saveBookHandler = (request, h) => {
   return response;
 };
 const getAllBooksHandler = (request, h) => {
-  const { name, reading, finished } = request.query;
-  if (name) {
-    const bookshelf = bookshelf.filter((b) => b.name.toLowerCase() === name.toLowerCase());
+  const params = request.query;
+  if (params.name) {
+    let nameBooks = bookshelf.filter(function(b){
+      return b.name.toLowerCase() == params.name.toLowerCase();
+    })
     return h.response({
       status: 'success',
       data: {
-        books: bookshelf.map((book) => ({
+        books: nameBooks.map((book) => ({
           id: book.id,
           name: book.name,
           publisher: book.publisher,
@@ -81,12 +83,22 @@ const getAllBooksHandler = (request, h) => {
       },
     }).code(200);
   }
-  if (reading) {
-    const bookshelf = bookshelf.filter((b) => Number(b.reading) === reading);
+  if (params.reading) {
+    let readedBooks;
+    if(params.reading == 1){
+      readedBooks = bookshelf.filter(function(b){
+        return b.reading === true;
+      })
+    }else{
+      readedBooks = bookshelf.filter(function(b){
+        return b.reading === false;
+      })
+    }
+    
     return h.response({
       status: 'success',
       data: {
-        books: bookshelf.map((book) => ({
+        books: readedBooks.map((book) => ({
           id: book.id,
           name: book.name,
           publisher: book.publisher,
@@ -94,12 +106,22 @@ const getAllBooksHandler = (request, h) => {
       },
     }).code(200);
   }
-  if (finished) {
-    const bookshelf = bookshelf.filter((b) => Number(b.finished) === finished);
+  if (params.finished) {
+    let finishedBooks;
+    if(params.finished == 1){
+      finishedBooks = bookshelf.filter(function(b){
+        return b.readPage === b.pageCount;
+      })
+    }else{
+      finishedBooks = bookshelf.filter(function(b){
+        return b.readPage < b.pageCount;
+      })
+    }
+    
     return h.response({
       status: 'success',
       data: {
-        books: bookshelf.map((book) => ({
+        books: finishedBooks.map((book) => ({
           id: book.id,
           name: book.name,
           publisher: book.publisher,
@@ -107,7 +129,7 @@ const getAllBooksHandler = (request, h) => {
       },
     }).code(200);
   }
-  if (!name && !reading && !finished) {
+  if (!params.name && !params.reading && !params.finished) {
     return h.response({
       status: 'success',
       data: {
